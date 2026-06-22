@@ -1,6 +1,10 @@
 import { Router } from 'express';
 
-import { checkDatabaseConnection, prisma } from '../prisma.js';
+import {
+  checkDatabaseConnection,
+  prisma,
+  prismaRuntimeInfo,
+} from '../prisma.js';
 
 export const healthRouter = Router();
 
@@ -22,6 +26,13 @@ healthRouter.get('/db', async (req, res) => {
     ok: false,
     database: 'disconnected',
     error: result.error,
+  });
+});
+
+healthRouter.get('/runtime', (req, res) => {
+  res.json({
+    ok: true,
+    prisma: prismaRuntimeInfo,
   });
 });
 

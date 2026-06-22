@@ -18,6 +18,14 @@ import {
   responseEnvelope,
 } from './utils/apiResponse.js';
 
+process.on('unhandledRejection', (reason) => {
+  console.error('[Luodian Backend] unhandled rejection', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('[Luodian Backend] uncaught exception', error);
+});
+
 const app = express();
 const server = http.createServer(app);
 const corsOrigin = config.corsOrigins.includes('*') ? true : config.corsOrigins;
