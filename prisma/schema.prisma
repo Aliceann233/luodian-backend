@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  username  String   @unique
+  password  String   @map("password_hash")
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  friendshipsStarted  Friendship[] @relation("FriendshipUser")
+  friendshipsReceived Friendship[] @relation("FriendshipFriend")
+  friendshipRequests  Friendship[] @relation("FriendshipRequester")
+
+  @@map("users")
+}
+
+model Message {
+  id         String   @id @default(uuid()) @db.Uuid
+  fromUserId String   @map("from_user_id") @db.Uuid
+  toUserId   String   @map("to_user_id") @db.Uuid
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  isRead     Boolean  @default(false) @map("is_read")
+  readAt     DateTime? @map("read_at")
+
+  fromUser User  @relation("SentMessages", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("ReceivedMessages", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  @@index([fromUserId, toUserId, createdAt])
+  @@index([toUserId, createdAt])
+  @@index([fromUserId, toUserId, isRead])
+  @@map("messages")
+}
+
+model Friendship {
+  id            String           @id @default(uuid()) @db.Uuid
+  userId        String           @map("user_id") @db.Uuid
+  friendId      String           @map("friend_id") @db.Uuid
+  requestedById String           @map("requested_by_id") @db.Uuid
+  status        FriendshipStatus @default(pending)
+  createdAt     DateTime         @default(now()) @map("created_at")
+
+  user        User @relation("FriendshipUser", fields: [userId], references: [id], onDelete: Cascade)
+  friend      User @relation("FriendshipFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  requestedBy User @relation("FriendshipRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@index([friendId, status, createdAt])
+  @@index([requestedById, status, createdAt])
+  @@map("friendships")
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
+  rejected
+}
