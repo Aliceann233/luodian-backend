@@ -69,20 +69,28 @@ export async function sendFriendRequest(
     return;
   }
 
-  const friendship = await prisma.friendship.upsert({
-    where: { userId_friendId: pair },
-    update: {
-      requestedById: currentUserId,
-      status: 'pending',
-    },
-    create: {
-      ...pair,
-      requestedById: currentUserId,
-    },
-    include: friendshipInclude,
-  });
+  try {
+    const friendship = await prisma.friendship.upsert({
+      where: { userId_friendId: pair },
+      update: {
+        requestedById: currentUserId,
+        status: 'pending',
+      },
+      create: {
+        ...pair,
+        requestedById: currentUserId,
+      },
+      include: friendshipInclude,
+    });
 
-  res.status(201).json(formatFriendship(friendship, currentUserId));
+    res.status(201).json(formatFriendship(friendship, currentUserId));
+  } catch (error) {
+    console.error('[Luodian Backend] friend request failed', error);
+    res.status(500).json({
+      error: 'Friend request failed',
+      debug: prismaErrorInfo(error),
+    });
+  }
 }
 
 export async function acceptFriendRequest(
@@ -259,4 +267,25 @@ function parseFriendshipIdentifier(body: unknown): string | null {
   }
 
   return null;
+}
+
+function prismaErrorInfo(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return undefined;
+  }
+
+  const candidate = error as {
+    code?: unknown;
+    name?: unknown;
+    message?: unknown;
+    meta?: unknown;
+  };
+
+  return {
+    code: typeof candidate.code === 'string' ? candidate.code : undefined,
+    name: typeof candidate.name === 'string' ? candidate.name : undefined,
+    message:
+      typeof candidate.message === 'string' ? candidate.message : undefined,
+    meta: candidate.meta,
+  };
 }

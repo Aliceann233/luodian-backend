@@ -1,9 +1,13 @@
 import { prisma } from '../prisma.js';
 
 export function getFriendshipPair(firstUserId: string, secondUserId: string) {
-  return firstUserId < secondUserId
+  return uuidSortKey(firstUserId) < uuidSortKey(secondUserId)
     ? { userId: firstUserId, friendId: secondUserId }
     : { userId: secondUserId, friendId: firstUserId };
+}
+
+function uuidSortKey(value: string) {
+  return value.replace(/-/g, '').toLowerCase();
 }
 
 export async function areUsersFriends(
