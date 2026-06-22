@@ -45,7 +45,6 @@ type PersistedMessage = {
   fromUser: {
     id: string;
     username: string;
-    avatar: string | null;
   };
 };
 
@@ -165,7 +164,7 @@ export function registerSocketHandlers(io: Server) {
             },
             include: {
               fromUser: {
-                select: { id: true, username: true, avatar: true },
+                select: { id: true, username: true },
               },
             },
           });

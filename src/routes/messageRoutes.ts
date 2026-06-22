@@ -43,7 +43,7 @@ messageRouter.get(
       },
       orderBy: { createdAt: 'asc' },
       include: {
-        fromUser: { select: { id: true, username: true, avatar: true } },
+        fromUser: { select: { id: true, username: true } },
       },
     });
 

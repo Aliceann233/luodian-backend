@@ -23,7 +23,6 @@ userRouter.get('/', requireAuth, asyncRoute(async (req: AuthenticatedRequest, re
     select: {
       id: true,
       username: true,
-      avatar: true,
       createdAt: true,
     },
   });

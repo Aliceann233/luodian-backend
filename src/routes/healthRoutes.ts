@@ -55,7 +55,7 @@ healthRouter.get('/schema', async (req, res) => {
     }, {});
 
     const required = {
-      users: ['id', 'username', 'password_hash', 'avatar', 'created_at'],
+      users: ['id', 'username', 'password', 'created_at'],
       messages: [
         'id',
         'from_user_id',

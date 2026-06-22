@@ -17,7 +17,6 @@ const credentialsSchema = z.object({
 const safeUserSelect = {
   id: true,
   username: true,
-  avatar: true,
   createdAt: true,
 } as const;
 
@@ -91,7 +90,7 @@ export async function register(req: Request, res: Response) {
 
     const password = await bcrypt.hash(parsed.data.password, 12);
     const user = await prisma.user.create({
-      data: { username, password, avatar: '' },
+      data: { username, password },
       select: safeUserSelect,
     });
 
@@ -129,7 +128,7 @@ export async function login(req: Request, res: Response) {
       user: {
         id: user.id,
         username: user.username,
-        avatar: user.avatar,
+        avatar: '',
         createdAt: user.createdAt,
       },
     });

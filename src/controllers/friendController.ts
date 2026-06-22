@@ -25,7 +25,6 @@ const legacyRequestIdSchema = z.object({
 const friendUserSelect = {
   id: true,
   username: true,
-  avatar: true,
   createdAt: true,
 } as const;
 
